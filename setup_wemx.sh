@@ -2,7 +2,7 @@
 
 SCRIPT_PATH=$(realpath "$0")
 APP_DIR="/opt/wemx-setup"
-REPO_URL="https://your-github.com/EWANZO101/wemx-flask-setup.git"  # 🔁 Replace with your actual repo
+REPO_URL="https://github.com/EWANZO101/wemxsetup"  # 🔁 Replace with your actual repo
 PYTHON_BIN="/usr/bin/python3"
 
 echo "🚀 Starting WEMX setup..."
