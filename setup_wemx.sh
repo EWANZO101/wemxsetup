@@ -4,6 +4,8 @@ SCRIPT_PATH=$(realpath "$0")
 APP_DIR="/opt/wemx-setup"
 REPO_URL="https://github.com/EWANZO101/wemxsetup"  # 🔁 Replace with your actual repo
 PYTHON_BIN="/usr/bin/python3"
+NGINX_CONF="/etc/nginx/sites-available/wemx.conf"
+EMAIL="your-email@example.com"   # 🔁 Replace with your email for certbot notifications
 
 echo "🚀 Starting WEMX setup..."
 
@@ -12,6 +14,37 @@ apt update && apt upgrade -y
 
 # 2. Install required packages
 apt install -y nginx php php-cli php-mbstring unzip git curl python3 python3-pip
+
+# === Extract domain from Nginx config ===
+if [ ! -f "$NGINX_CONF" ]; then
+    echo "❌ Nginx config $NGINX_CONF not found!"
+    exit 1
+fi
+
+DOMAIN=$(grep -Po 'server_name\s+\K[^;]+' "$NGINX_CONF" | head -1)
+
+if [ -z "$DOMAIN" ]; then
+    echo "❌ Could not extract domain from $NGINX_CONF"
+    exit 1
+fi
+
+echo "🔍 Found domain: $DOMAIN"
+
+# === Install Certbot ===
+apt install -y certbot python3-certbot-nginx
+
+# === Obtain SSL certificate with Certbot ===
+echo "🔐 Requesting Let's Encrypt certificate for $DOMAIN..."
+
+# Stop nginx briefly to avoid port conflicts if needed
+systemctl stop nginx
+
+certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" --redirect
+
+# Restart nginx to load certs
+systemctl start nginx
+
+echo "✅ SSL certificate installed for $DOMAIN"
 
 # 3. Clone Flask App
 if [ ! -d "$APP_DIR" ]; then
@@ -48,7 +81,9 @@ systemctl daemon-reload
 systemctl enable wemx-flask
 systemctl start wemx-flask
 
-# 7. Allow Flask port
+# 7. Allow necessary ports
+ufw allow 80 || true
+ufw allow 443 || true
 ufw allow 5000 || true
 
 echo "✅ WEMX Flask app started on port 5000."
@@ -66,8 +101,8 @@ DOMAIN_FILE="$APP_DIR/.setup_domain"
 
 for ((i=1; i<=MAX_RETRIES; i++)); do
     if [ -f "$SUCCESS_FLAG" ] && [ -f "$DOMAIN_FILE" ]; then
-        DOMAIN=$(cat "$DOMAIN_FILE")
-        ping -c 1 "$DOMAIN" >/dev/null 2>&1
+        DOMAIN_CHECK=$(cat "$DOMAIN_FILE")
+        ping -c 1 "$DOMAIN_CHECK" >/dev/null 2>&1
         if [ $? -eq 0 ]; then
             echo "✅ Domain responded successfully!"
             echo "🧹 Cleaning up setup files..."
@@ -77,7 +112,7 @@ for ((i=1; i<=MAX_RETRIES; i++)); do
             echo "💣 Setup script deleted itself. Done!"
             exit 0
         else
-            echo "⏳ Waiting for domain ($DOMAIN) to respond... ($i/$MAX_RETRIES)"
+            echo "⏳ Waiting for domain ($DOMAIN_CHECK) to respond... ($i/$MAX_RETRIES)"
         fi
     else
         echo "⌛ Waiting for web setup to complete... ($i/$MAX_RETRIES)"
