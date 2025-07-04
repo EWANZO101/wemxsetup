@@ -1,81 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WEMX Setup</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/flowbite@2.2.1/dist/flowbite.min.css" rel="stylesheet" />
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
-  <div class="max-w-2xl w-full bg-gray-800 rounded-xl shadow-lg p-8">
-    <h1 class="text-4xl font-extrabold mb-8 text-center">🚀 Setup Your WEMX Domain</h1>
-
-    <section class="mb-8 text-gray-300 space-y-3">
-      <p class="font-semibold">Before starting:</p>
-      <ul class="list-disc list-inside text-sm space-y-1">
-        <li>Log in to your domain provider (e.g., <strong>Cloudflare</strong>, Namecheap, GoDaddy).</li>
-        <li>Create an <strong>A record</strong> pointing your domain to this server’s IP:</li>
-      </ul>
-
-      <pre class="bg-gray-700 rounded p-3 mt-2 font-mono text-lg text-center select-all">{{ vm_ip }}</pre>
-
-      <p class="mt-4 text-sm">
-        ⚠️ Also set the same domain + IP in your <a href="https://wemx.net/dashboard" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline hover:text-blue-500">WEMX.NET dashboard</a>.
-      </p>
-    </section>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <div
-          class="mb-6 p-4 rounded text-sm font-medium
-            {{ 'bg-green-700 text-green-100' if category == 'success' else 'bg-red-700 text-red-100' }}"
-          role="alert"
-          aria-live="polite"
-        >
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endwith %}
-
-    <form method="POST" class="space-y-6" novalidate>
-      <div>
-        <label for="domain" class="block mb-2 text-sm font-semibold text-gray-200">Your Domain</label>
-        <input
-          id="domain"
-          name="domain"
-          type="text"
-          required
-          placeholder="example.com"
-          class="w-full rounded border border-gray-600 bg-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring focus:ring-blue-400 focus:outline-none"
-          pattern="^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
-          title="Enter a valid domain, e.g. example.com"
-          autocomplete="off"
-        />
-      </div>
-
-      <div>
-        <label for="license" class="block mb-2 text-sm font-semibold text-gray-200">WEMX License Key</label>
-        <input
-          id="license"
-          name="license"
-          type="text"
-          required
-          placeholder="XXXX-XXXX"
-          class="w-full rounded border border-gray-600 bg-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring focus:ring-blue-400 focus:outline-none"
-          autocomplete="off"
-        />
-      </div>
-
-      <button
-        type="submit"
-        class="w-full rounded bg-blue-600 py-3 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        Start Configuration
-      </button>
-    </form>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/flowbite@2.2.1/dist/flowbite.min.js"></script>
+<body>
+  <h1>License Setup</h1>
+  <p>Your VM IP: {{ vm_ip }}</p>
+  <form method="POST">
+    <label>License Key:</label><br>
+    <input type="text" name="license" required><br><br>
+    <button type="submit">Update License</button>
+  </form>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <p style="color: {{ 'red' if category == 'error' else 'green' }}">{{ message }}</p>
+    {% endfor %}
+  {% endwith %}
 </body>
 </html>
