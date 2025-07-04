@@ -1,55 +1,76 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WEMX Setup</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/flowbite@2.2.1/dist/flowbite.min.css" rel="stylesheet" />
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-  <div class="max-w-2xl mx-auto mt-10 p-6 bg-gray-800 rounded-xl shadow-lg">
-    <h1 class="text-3xl font-bold mb-6 text-center text-white">🚀 Setup Your WEMX Domain</h1>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="max-w-2xl w-full bg-gray-800 rounded-xl shadow-lg p-8">
+    <h1 class="text-4xl font-extrabold mb-8 text-center">🚀 Setup Your WEMX Domain</h1>
 
-    <div class="mb-6 text-gray-300">
-      <p class="mb-2">Before starting:</p>
-      <ul class="list-disc ml-6 text-sm space-y-1">
-        <li>Login to your domain provider (e.g., <strong>Cloudflare</strong>, Namecheap, GoDaddy).</li>
+    <section class="mb-8 text-gray-300 space-y-3">
+      <p class="font-semibold">Before starting:</p>
+      <ul class="list-disc list-inside text-sm space-y-1">
+        <li>Log in to your domain provider (e.g., <strong>Cloudflare</strong>, Namecheap, GoDaddy).</li>
         <li>Create an <strong>A record</strong> pointing your domain to this server’s IP:</li>
       </ul>
 
-      <div class="bg-gray-700 text-white p-3 mt-3 rounded text-center font-mono text-lg">
-        {{ vm_ip }}
-      </div>
+      <pre class="bg-gray-700 rounded p-3 mt-2 font-mono text-lg text-center select-all">{{ vm_ip }}</pre>
 
       <p class="mt-4 text-sm">
-        ⚠️ Also set the same domain + IP in your <a href="https://wemx.net/dashboard" class="text-blue-400 underline" target="_blank">WEMX.NET dashboard</a>.
+        ⚠️ Also set the same domain + IP in your <a href="https://wemx.net/dashboard" target="_blank" rel="noopener noreferrer" class="text-blue-400 underline hover:text-blue-500">WEMX.NET dashboard</a>.
       </p>
-    </div>
+    </section>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% for category, message in messages %}
-        <div class="mb-4 p-4 rounded text-sm
-            {{ 'bg-green-700 text-green-100' if category == 'success' else 'bg-red-700 text-red-100' }}">
+        <div
+          class="mb-6 p-4 rounded text-sm font-medium
+            {{ 'bg-green-700 text-green-100' if category == 'success' else 'bg-red-700 text-red-100' }}"
+          role="alert"
+          aria-live="polite"
+        >
           {{ message }}
         </div>
       {% endfor %}
     {% endwith %}
 
-    <form method="POST" class="space-y-4">
+    <form method="POST" class="space-y-6" novalidate>
       <div>
-        <label class="block mb-1 text-sm font-medium text-gray-200">Your Domain</label>
-        <input type="text" name="domain" required placeholder="example.com"
-               class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:ring focus:ring-blue-500">
+        <label for="domain" class="block mb-2 text-sm font-semibold text-gray-200">Your Domain</label>
+        <input
+          id="domain"
+          name="domain"
+          type="text"
+          required
+          placeholder="example.com"
+          class="w-full rounded border border-gray-600 bg-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring focus:ring-blue-400 focus:outline-none"
+          pattern="^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
+          title="Enter a valid domain, e.g. example.com"
+          autocomplete="off"
+        />
       </div>
 
       <div>
-        <label class="block mb-1 text-sm font-medium text-gray-200">WEMX License Key</label>
-        <input type="text" name="license" required placeholder="XXXX-XXXX"
-               class="w-full p-2 bg-gray-700 text-white border border-gray-600 rounded focus:ring focus:ring-blue-500">
+        <label for="license" class="block mb-2 text-sm font-semibold text-gray-200">WEMX License Key</label>
+        <input
+          id="license"
+          name="license"
+          type="text"
+          required
+          placeholder="XXXX-XXXX"
+          class="w-full rounded border border-gray-600 bg-gray-700 px-4 py-2 text-white placeholder-gray-400 focus:border-blue-500 focus:ring focus:ring-blue-400 focus:outline-none"
+          autocomplete="off"
+        />
       </div>
 
-      <button type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow">
+      <button
+        type="submit"
+        class="w-full rounded bg-blue-600 py-3 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
         Start Configuration
       </button>
     </form>
