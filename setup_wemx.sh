@@ -5,7 +5,7 @@ APP_DIR="/opt/wemx-setup"
 REPO_URL="https://github.com/EWANZO101/wemxsetup"  # 🔁 Replace with your actual repo
 PYTHON_BIN="/usr/bin/python3"
 NGINX_CONF="/etc/nginx/sites-available/wemx.conf"
-EMAIL="your-email@example.com"   # 🔁 Replace with your email for certbot notifications
+EMAIL="certbot@swiftpeakhosting.com"   # Your email for certbot notifications
 
 echo "🚀 Starting WEMX setup..."
 
@@ -33,15 +33,15 @@ echo "🔍 Found domain: $DOMAIN"
 # === Install Certbot ===
 apt install -y certbot python3-certbot-nginx
 
-# === Obtain SSL certificate with Certbot ===
+# === Obtain SSL certificate with Certbot (fully automated) ===
 echo "🔐 Requesting Let's Encrypt certificate for $DOMAIN..."
 
-# Stop nginx briefly to avoid port conflicts if needed
+# Stop nginx to avoid port conflicts if needed
 systemctl stop nginx
 
-certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos -m "$EMAIL" --redirect
+certbot --nginx -d "$DOMAIN" -m "$EMAIL" --agree-tos --non-interactive --redirect
 
-# Restart nginx to load certs
+# Restart nginx to load certificates
 systemctl start nginx
 
 echo "✅ SSL certificate installed for $DOMAIN"
@@ -53,14 +53,14 @@ else
     cd $APP_DIR && git pull
 fi
 
-# 4. Install Python deps
+# 4. Install Python dependencies
 cd $APP_DIR
 pip3 install -r requirements.txt
 
 # 5. Make artisan executable
 chmod +x /var/www/wemx/artisan
 
-# 6. Create systemd service
+# 6. Create systemd service for Flask app
 cat > /etc/systemd/system/wemx-flask.service <<EOF
 [Unit]
 Description=WEMX Setup Flask App
@@ -81,7 +81,7 @@ systemctl daemon-reload
 systemctl enable wemx-flask
 systemctl start wemx-flask
 
-# 7. Allow necessary ports
+# 7. Allow necessary firewall ports
 ufw allow 80 || true
 ufw allow 443 || true
 ufw allow 5000 || true
